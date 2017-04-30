@@ -1,0 +1,11 @@
+[
+  { "m": "Ciao"},
+  { "q": "Dimmi", "answers": [
+    {"choice": "Genre", "next": "ChooseGenre"},
+    {"choice": "Artist", "next": "ChooseArtist"}
+  ]},
+  { "label": "ChooseGenre", "setters": ["isGenre"], "m": "ok"},
+  {"q": "Ok, genre?", "fallback": "Asd"},
+  { "label": "ChooseArtist", "setters": ["isArtist"], "q": "Ok, artists?", "fallback": "Asd"},
+  { "label": "Asd", "m": "Ok, ho trovato questi"}
+]
