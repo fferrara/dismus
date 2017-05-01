@@ -8,14 +8,18 @@ from cv.listen.intent import Entity, IntentResponse
 
 __author__ = 'Flavio Ferrara'
 
+
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
 
 class Node:
     def __init__(self, message, label=None, next_label=None):
         self.label = label or id_generator()
-        self._message = message
-        self._next = next_label
+        self.__message = message
+        self.__next = next_label
+        self.__setters = []
+        self.__checkers = []
 
     def __eq__(self, other):
         if not isinstance(other, Node):
@@ -31,11 +35,25 @@ class Node:
 
     @property
     def message(self):
-        return self._message
+        return self.__message
 
     @property
     def next_label(self):
-        return self._next
+        return self.__next
+
+    def add_checker(self, checker):
+        self.__checkers.append(checker)
+
+    def add_setter(self, setter):
+        self.__setters.append(setter)
+
+    @property
+    def checkers(self):
+        return self.__checkers
+
+    @property
+    def setters(self):
+        return self.__setters
 
 
 class RandomMessageNode(Node):
@@ -48,21 +66,18 @@ class RandomMessageNode(Node):
         return random.choice(self._messages)
 
 
-class Question:
-    def __init__(self, question, answers, fallback, label=None):
+class Question(Node):
+    def __init__(self, question, fallback, label=None):
         """
 
         The fallback intent is matched when none of the answers matched
 
-        :param string question: The question text
-        :param answers:
-        :param string fallback: The fallback intent name
+        :param str question: The question text
+        :param str fallback: The fallback intent name
         :param label:
         """
-        self.question = question
-        self.answers = answers
+        super().__init__(question, label)
         self.fallback = fallback
-        self.label = label or id_generator()
 
     def __eq__(self, other):
         if not isinstance(other, Question):
@@ -73,8 +88,20 @@ class Question:
     def __hash__(self):
         return hash(self.label)
 
-    def __str__(self):
-        return self.question
+
+class IntentQuestion(Question):
+    def __init__(self, question, fallback, answers, label=None):
+        """
+
+        The fallback intent is matched when none of the answers matched
+
+        :param str question: The question text
+        :param answers:
+        :param stri fallback: The fallback intent name
+        :param label:
+        """
+        super().__init__(question, fallback, label)
+        self.answers = answers
 
     def get_next(self, reply):
         try:
@@ -82,6 +109,21 @@ class Question:
             return matched_answer.get_next_label()
         except StopIteration:
             return None
+
+
+class TriggerQuestion(Question):
+    def __init__(self, question, fallback, trigger, label=None):
+        """
+
+        The fallback intent is matched when none of the answers matched
+
+        :param str question: The question text
+        :param str collect: The
+        :param str fallback: The fallback intent name
+        :param label:
+        """
+        super().__init__(question, fallback, label)
+        self.trigger = trigger
 
 
 class Answer(ABC):
@@ -135,6 +177,10 @@ class IntentAnswer(Answer):
 
 
 class ChoiceAnswer(Answer):
+    def __init__(self, next_label, choice):
+        self.next_label = next_label
+        self.choice = choice
+
     def get_next_label(self):
         return self.next_label
 
@@ -148,7 +194,3 @@ class ChoiceAnswer(Answer):
             return False
 
         return self.choice == reply
-
-    def __init__(self, next_label, choice):
-        self.next_label = next_label
-        self.choice = choice

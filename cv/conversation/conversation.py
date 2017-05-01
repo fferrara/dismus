@@ -2,6 +2,7 @@ import json
 
 from cv.conversation.conversation_graph import IntentAnswer, ChoiceAnswer, Node, RandomMessageNode, Question
 from cv.listen.intent import Intent, Entity
+from ..context import ContextManager
 from shared.exceptions import LabelNotFoundException
 
 
@@ -10,9 +11,15 @@ __author__ = 'Flavio Ferrara'
 
 class Conversation:
     def __init__(self, story, context):
+        """
+
+        :param story:
+        :param ContextManager context: The context object
+        """
         self.story = story  # type: List
         self.context = context
         self.current_index = 0
+        self.flags = {}
 
     def current_node(self) -> Node:
         """
@@ -22,6 +29,12 @@ class Conversation:
 
     def set_current_node(self, from_node):
         self.current_index = self.story.index(from_node)
+
+    def is_flag_set(self, flag):
+        return self.context.is_flag(flag)
+
+    def execute_trigger(self, trigger):
+        return self.context.execute_trigger(trigger)
 
     def next_node(self):
         try:
@@ -77,9 +90,12 @@ class Conversation:
         node = from_node or self.current_node()
         while node is not None:
             nodes.append(node)
+
+            for setter in node.setters:
+                self.context.set_flag(setter)
+
             if isinstance(node, Question):
                 break
-
             node = self.next_node()
 
         return nodes
@@ -101,7 +117,6 @@ class Conversation:
 
     def _get_global_handler(self, intent_response):
         return 'Handle' + intent_response.intent.name
-
 
     @staticmethod
     def load_from_json(encoded, context):
@@ -132,10 +147,10 @@ class Conversation:
             """
             if 'm' in dict:
                 # Is a simple Node
-                return Node(dict['m'], dict.get('label'), dict.get('next'))
+                node = Node(dict['m'], dict.get('label'), dict.get('next'))
             elif 'messages' in dict:
                 # Node with multiple messages
-                return RandomMessageNode(dict['messages'], dict.get('label'))
+                node = RandomMessageNode(dict['messages'], dict.get('label'))
             elif 'q' in dict:
                 # Is a question
                 if 'answers' not in dict and 'fallback' not in dict:
@@ -144,11 +159,20 @@ class Conversation:
                     pass
                 answers = 'answers' in dict and [build_answer(a) for a in dict['answers']] or []
                 fallback = dict.get('fallback')
-                return Question(dict['q'], answers, fallback, dict.get('label'))
+                node = Question(dict['q'], answers, fallback, dict.get('label'))
+            else:
+                raise ValueError('Each line must be a message or a question')
 
-            raise ValueError('Each line must be a message or a question')
+            for setter in dict.get('setters', []):
+                node.add_setter(setter)
+
+            for checker in dict.get('checkers', []):
+                node.add_checker(checker)
+
+            return node
 
         decoded = json.loads(encoded)
 
         story = [create_node(record) for record in decoded]
         return Conversation(story, context)
+

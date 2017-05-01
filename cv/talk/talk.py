@@ -41,7 +41,7 @@ class QuestionMessage(Message):
 
         :param question: Question
         """
-        super().__init__(question_node.question, 'QUESTION')
+        super().__init__(question_node.message, 'QUESTION')
         self.choices = [a.choice for a in question_node.answers if isinstance(a, ChoiceAnswer)]
 
     def __repr__(self):

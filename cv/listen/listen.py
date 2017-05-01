@@ -2,6 +2,7 @@ import json
 import logging
 from cv.listen.luis import LUISHandler
 from shared.exceptions import LabelNotFoundException
+from ..conversation import Conversation
 
 __author__ = 'Flavio Ferrara'
 
@@ -47,6 +48,13 @@ class ListenManager():
         :param string text:
         """
         print('interpret {}'.format(sentence.text))
+
+        if sentence.has_trigger():
+                trigger_messages = self.conversation.execute_trigger(sentence.trigger)
+                node = self.conversation.next_node()
+                trigger_messages.append(node)
+                return trigger_messages
+
         try:
             if sentence.isChoice():
                 node = self.conversation.get_choice_reply(sentence.text)

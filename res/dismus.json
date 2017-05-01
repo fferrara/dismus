@@ -4,8 +4,9 @@
     {"choice": "Genre", "next": "ChooseGenre"},
     {"choice": "Artist", "next": "ChooseArtist"}
   ]},
-  { "label": "ChooseGenre", "setters": ["isGenre"], "m": "ok"},
-  {"q": "Ok, genre?", "fallback": "Asd"},
-  { "label": "ChooseArtist", "setters": ["isArtist"], "q": "Ok, artists?", "fallback": "Asd"},
-  { "label": "Asd", "m": "Ok, ho trovato questi"}
+  { "label": "ChooseGenre", "setters": ["startGenre"], "m": "ok"},
+  {"q": "Ok, genre?", "trigger": "getArtistsByGenre", "fallback": "Asd"},
+  { "label": "ChooseArtist", "setters": ["startArtist"], "q": "Ok, artists?", "trigger": "getRelatedArtists" ,"fallback": "Ops"},
+    { "label": "Asd", "m": "Ok, ho trovato questi"},
+   { "label": "Ops", "m": "Dio boia"}
 ]
