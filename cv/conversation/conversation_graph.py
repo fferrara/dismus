@@ -3,7 +3,7 @@ import collections
 import random
 import string
 
-from cv.listen.intent import Entity, IntentResponse
+from cv.conversation.intent import Entity, IntentResponse
 
 
 __author__ = 'Flavio Ferrara'
@@ -20,6 +20,7 @@ class Node:
         self.__next = next_label
         self.__setters = []
         self.__checkers = []
+        self.__trigger = None
 
     def __eq__(self, other):
         if not isinstance(other, Node):
@@ -55,6 +56,22 @@ class Node:
     def setters(self):
         return self.__setters
 
+    def set_trigger(self, trigger):
+        self.__trigger = trigger
+
+    def has_trigger(self):
+        return self.__trigger is not None
+
+    @property
+    def trigger(self):
+        return self.__trigger
+
+    def toDTO(self):
+        return {
+            'type': 'MESSAGE',
+            'text': self.message
+        }
+
 
 class RandomMessageNode(Node):
     def __init__(self, messages, label=None):
@@ -88,6 +105,17 @@ class Question(Node):
     def __hash__(self):
         return hash(self.label)
 
+    def __repr__(self):
+        return 'QUESTION: {}'.format(self.message)
+
+    def toDTO(self):
+        d = {
+            'type': 'QUESTION',
+            'text': self.message
+        }
+
+        return d
+
 
 class IntentQuestion(Question):
     def __init__(self, question, fallback, answers, label=None):
@@ -96,9 +124,9 @@ class IntentQuestion(Question):
         The fallback intent is matched when none of the answers matched
 
         :param str question: The question text
-        :param answers:
-        :param stri fallback: The fallback intent name
-        :param label:
+        :param List answers: List of answers
+        :param str fallback: The fallback intent name
+        :param str label: The label
         """
         super().__init__(question, fallback, label)
         self.answers = answers
@@ -109,6 +137,17 @@ class IntentQuestion(Question):
             return matched_answer.get_next_label()
         except StopIteration:
             return None
+
+    def __repr__(self):
+        return 'INTENT_QUESTION {}'.format(self.message)
+
+    def toDTO(self):
+        d = super().toDTO()
+
+        if self.answers:
+            d['choices'] = [a.choice for a in self.answers if isinstance(a, ChoiceAnswer)]
+
+        return d
 
 
 class TriggerQuestion(Question):

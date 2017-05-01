@@ -1,7 +1,8 @@
 import json
 
-from cv.conversation.conversation_graph import IntentAnswer, ChoiceAnswer, Node, RandomMessageNode, Question
-from cv.listen.intent import Intent, Entity
+from cv.conversation.conversation_graph import IntentAnswer, ChoiceAnswer, Node, RandomMessageNode, Question, \
+    IntentQuestion
+from cv.conversation.intent import Intent, Entity
 from ..context import ContextManager
 from shared.exceptions import LabelNotFoundException
 
@@ -33,8 +34,8 @@ class Conversation:
     def is_flag_set(self, flag):
         return self.context.is_flag(flag)
 
-    def execute_trigger(self, trigger):
-        return self.context.execute_trigger(trigger)
+    def execute_trigger(self, trigger, param):
+        return self.context.execute_trigger(trigger, param)
 
     def next_node(self):
         try:
@@ -159,7 +160,7 @@ class Conversation:
                     pass
                 answers = 'answers' in dict and [build_answer(a) for a in dict['answers']] or []
                 fallback = dict.get('fallback')
-                node = Question(dict['q'], answers, fallback, dict.get('label'))
+                node = IntentQuestion(dict['q'], fallback, answers, dict.get('label'))
             else:
                 raise ValueError('Each line must be a message or a question')
 
@@ -168,6 +169,8 @@ class Conversation:
 
             for checker in dict.get('checkers', []):
                 node.add_checker(checker)
+
+            node.set_trigger(dict.get('trigger', None))
 
             return node
 

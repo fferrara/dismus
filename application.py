@@ -1,7 +1,6 @@
 from cv.context import ContextManager
 from cv.conversation import Conversation
-from cv.listen import ListenManager
-from cv.listen.listen import InputSentence
+from cv.listen import ListenManager, InputSentence
 from cv.talk import TalkManager
 from ws.ws import WebSocketServer
 import logging

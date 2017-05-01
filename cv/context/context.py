@@ -1,3 +1,4 @@
+from abc import ABC
 from cv.context.knowledge.spotify import SpotifySource
 
 __author__ = 'Flavio Ferrara'
@@ -27,8 +28,8 @@ class ContextManager():
     def getRelatedArtists(self, artist_name):
         return self.source.getRelatedArtists(artist_name)
 
-    def execute_trigger(self, trigger):
+    def execute_trigger(self, trigger, param):
         trigger_handler = getattr(self, trigger)
-        return trigger_handler()
+        return trigger_handler(param)
 
 

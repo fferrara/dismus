@@ -1,5 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from entity.artist import Artist
 from ..knowledge.source import KnowledgeSource
 from shared.exceptions import ArtistNotFoundException
 
@@ -15,7 +16,7 @@ class SpotifySource(KnowledgeSource):
         results = self.spotify.artist_related_artists(artist['id'])
         artists = results['artists']
 
-        return [a['name'] for a in artists]
+        return [self._create_artist(a) for a in artists]
 
     def __init__(self):
         self.credential_manager = SpotifyClientCredentials()
@@ -45,3 +46,8 @@ class SpotifySource(KnowledgeSource):
             return items[0]
         else:
             return None
+
+    def _create_artist(self, artist_dict):
+        thumb_url = next(img['url'] for img in artist_dict['images'] if img['height'] < 400)
+        print(thumb_url)
+        return Artist(artist_dict['name'], thumb_url)

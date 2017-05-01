@@ -1,3 +1,3 @@
 __author__ = 'Flavio Ferrara'
 
-from .listen import ListenManager
+from .listen import ListenManager, InputSentence

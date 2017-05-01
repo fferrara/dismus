@@ -2,7 +2,7 @@ import os
 
 import requests
 
-from cv.listen.intent import SentenceHandler, IntentResponse, Intent, Entity
+from cv.conversation.intent import SentenceHandler, IntentResponse, Intent, Entity
 
 
 __author__ = 'Flavio Ferrara'

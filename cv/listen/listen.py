@@ -49,11 +49,12 @@ class ListenManager():
         """
         print('interpret {}'.format(sentence.text))
 
-        if sentence.has_trigger():
-                trigger_messages = self.conversation.execute_trigger(sentence.trigger)
-                node = self.conversation.next_node()
-                trigger_messages.append(node)
-                return trigger_messages
+        if self.conversation.current_node().has_trigger():
+            trigger = self.conversation.current_node().trigger
+            trigger_messages = self.conversation.execute_trigger(trigger, sentence.text)
+            node = self.conversation.next_node()
+            trigger_messages.append(node)
+            return trigger_messages
 
         try:
             if sentence.isChoice():
