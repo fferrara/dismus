@@ -1,8 +1,10 @@
+from threading import Thread
 from cv.context import ContextManager
 from cv.conversation import Conversation
 from cv.listen import ListenManager, InputSentence
 from cv.talk import TalkManager
 from ws.ws import WebSocketServer
+from rest.server import DisMusRest
 import logging
 
 
@@ -25,7 +27,7 @@ def channel_flow(channel, listen, talk):
 
 
 def main():
-    #logging.basicConfig(filename='cv.log', format='%(asctime)s %(message)s', level=logging.INFO)
+    # logging.basicConfig(filename='cv.log', format='%(asctime)s %(message)s', level=logging.INFO)
 
     with open('res/dismus.json', encoding='utf-8') as f:
         conversation_json = f.read()
@@ -35,15 +37,20 @@ def main():
     listen = ListenManager(my_conversation)
     talk = TalkManager(my_conversation)
 
-    application = WebSocketServer()
-    application.debug = True
+    ws = WebSocketServer()
+    ws.debug = True
 
-    application.get_client_stream().subscribe(
+    ws.get_client_stream().subscribe(
         lambda channel: channel_flow(channel, listen, talk)
     )
 
-    application.run()
+    ws_server = Thread(target=ws.run)
+    ws_server.start()
 
+    api = DisMusRest(context_manager)
+
+    api_server = Thread(target=api.run)
+    api_server.start()
 
 
 if __name__ == '__main__':
