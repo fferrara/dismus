@@ -6,7 +6,10 @@
   ]},
   { "label": "ChooseGenre", "setters": ["startGenre"], "m": "ok"},
   {"q": "Ok, genre?", "trigger": "getArtistsByGenre", "fallback": "Asd"},
-  { "label": "ChooseArtist", "setters": ["startArtist"], "q": "Ok, artists?", "trigger": "getRelatedArtists" ,"fallback": "Ops"},
+  { "label": "ChooseArtist", "setters": ["startArtist"], "q": "Ok, artists?", "trigger": "get_related_artists" ,"fallback": "Ops"},
     { "label": "Asd", "m": "Ok, ho trovato questi"},
+  { "m": "If you like some of them, let me know by clicking <i class=\"fa fa-thumbs-up\"></i>"},
+  { "m": "If you dislike some of them, well... sorry :flushed: You can let me know though."},
+  { "q": "Vuoi dirmi una traccia?", "trigger": "get_by_track"},
    { "label": "Ops", "m": "Dio boia"}
 ]

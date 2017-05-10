@@ -8,12 +8,16 @@ __author__ = 'Flavio Ferrara'
 
 
 class SpotifySource(KnowledgeSource):
-    def getRelatedArtists(self, artist_name):
-        artist = self._get_artist(artist_name)
-        if artist is None:
-            raise ArtistNotFoundException
+    def get_related_artists(self, artist_id):
+        """
 
-        results = self.spotify.artist_related_artists(artist['id'])
+
+        :rtype : list of Artist
+        :param artist_name:
+        :return: List
+        :raise ArtistNotFoundException:
+        """
+        results = self.spotify.artist_related_artists(artist_id)
         artists = results['artists']
 
         return [self._create_artist(a) for a in artists]
@@ -26,7 +30,7 @@ class SpotifySource(KnowledgeSource):
         if isinstance(artist_names, str):
             artist_names = [artist_names]
 
-        artists = [self._get_artist(name) for name in artist_names]
+        artists = [self.get_artist(name) for name in artist_names]
         seeds = [artist['id'] for artist in artists if artist is not None]
 
         results = self.spotify.recommendations(seed_artists = seeds)
@@ -39,7 +43,7 @@ class SpotifySource(KnowledgeSource):
     def getByTrack(self, tracks):
         pass
 
-    def _get_artist(self, artist_name):
+    def get_artist(self, artist_name):
         results = self.spotify.search(q='artist:' + artist_name, type='artist')
         items = results['artists']['items']
         if len(items) > 0:
@@ -48,6 +52,8 @@ class SpotifySource(KnowledgeSource):
             return None
 
     def _create_artist(self, artist_dict):
-        thumb_url = next(img['url'] for img in artist_dict['images'] if img['height'] < 400)
-        print(thumb_url)
-        return Artist(artist_dict['name'], thumb_url)
+        try:
+            thumb_url = next(img['url'] for img in artist_dict['images'] if img['height'] < 400)
+        except StopIteration:
+            thumb_url = artist_dict['images'][-1]['url']
+        return Artist(artist_dict['name'], thumb_url, spotify_id=artist_dict['id'])

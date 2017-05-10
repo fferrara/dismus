@@ -10,7 +10,7 @@ class KnowledgeSource(ABC):
     def getPlaylistByArtist(self, artist_names):
         raise NotImplementedError("Class %s doesn't implement getByArtist()" % self.__class__.__name__)
 
-    def getRelatedArtists(self, artist_name):
+    def get_related_artists(self, artist_name):
         raise NotImplementedError("Class %s doesn't implement getByArtist()" % self.__class__.__name__)
 
     def getByTrack(self, tracks):

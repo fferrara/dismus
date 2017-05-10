@@ -12,8 +12,9 @@ class InputSentence:
         self.type = _type
         self.text = text
 
-    def isChoice(self):
-        return self.type.upper() == 'CHOICE'
+    @property
+    def sentence_type(self):
+        return self.type.upper()
 
     @staticmethod
     def build(asJson):
@@ -29,41 +30,55 @@ class InputSentence:
 
 
 class ListenManager():
-    def __init__(self, conversation, handler=None):
+    def __init__(self, conversation, intent_handler=None):
         """
 
         :param Conversation conversation: The conversation object
         """
         self.conversation = conversation
-        if handler is not None:
-            self.handler = handler
+        if intent_handler is not None:
+            self.intent_handler = intent_handler
         else:
-            self.handler = LUISHandler()
+            self.intent_handler = LUISHandler()
+
+        self.sentence_handlers = {
+            'CHOICE': self._handle_choice,
+            'LIKE': self._handle_like,
+            'MESSAGE': self._handle_message
+        }
 
     def interpret(self, sentence):
         """
         The most important method of ListenManager.
         Will extract Intents, Choices and Entities from text returning an InterpretedText.
         :rtype : InterpretedText
-        :param string text:
+        :param InputSentence sentence: a sentence from the user
         """
         print('interpret {}'.format(sentence.text))
 
-        if self.conversation.current_node().has_trigger():
-            trigger = self.conversation.current_node().trigger
-            trigger_messages = self.conversation.execute_trigger(trigger, sentence.text)
-            node = self.conversation.next_node()
-            trigger_messages.append(node)
-            return trigger_messages
+        handler = self.sentence_handlers[sentence.sentence_type]
+        return handler(sentence)
 
+    def _handle_choice(self, sentence):
         try:
-            if sentence.isChoice():
-                node = self.conversation.get_choice_reply(sentence.text)
-            else:
-                response = self.handler.process_sentence(sentence)
-                node = self.conversation.get_intent_reply(response)
+            node = self.conversation.get_choice_reply(sentence.text)
+            return self.conversation.continue_topic(node)
         except LabelNotFoundException:
             logging.warning('Label not found while processing {}'.format(sentence.text))
             return []
 
-        return self.conversation.continue_topic(node)
+    def _handle_like(self, sentence):
+        return self.conversation.like_artist(sentence.text)
+
+    def _handle_message(self, sentence):
+        if self.conversation.current_node().has_trigger():
+            return self.conversation.execute_trigger(self.conversation.current_node().trigger, sentence.text)
+
+        try:
+            response = self.intent_handler.process_sentence(sentence)
+            node = self.conversation.get_intent_reply(response)
+            return self.conversation.continue_topic(node)
+        except LabelNotFoundException:
+            logging.warning('Label not found while processing {}'.format(sentence.text))
+            return []
+

@@ -150,20 +150,6 @@ class IntentQuestion(Question):
         return d
 
 
-class TriggerQuestion(Question):
-    def __init__(self, question, fallback, trigger, label=None):
-        """
-
-        The fallback intent is matched when none of the answers matched
-
-        :param str question: The question text
-        :param str collect: The
-        :param str fallback: The fallback intent name
-        :param label:
-        """
-        super().__init__(question, fallback, label)
-        self.trigger = trigger
-
 
 class Answer(ABC):
     @abstractmethod

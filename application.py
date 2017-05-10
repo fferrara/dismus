@@ -6,13 +6,20 @@ from ws.ws import WebSocketServer
 import logging
 
 
-def channel_flow(channel, listen, talk):
+def channel_flow(channel, conversation):
     """
 
     :param RxWebSocketProtocol channel:
     :param listen:
     :param talk:
     """
+    print('NEW channel', channel)
+
+    context_manager = ContextManager()
+    my_conversation = Conversation.load_from_json(conversation, context_manager)
+    listen = ListenManager(my_conversation)
+    talk = TalkManager(my_conversation)
+
     channel.get_message_stream().map(
         lambda msg: InputSentence.build(msg)
     ).map(
@@ -30,16 +37,11 @@ def main():
     with open('res/dismus.json', encoding='utf-8') as f:
         conversation_json = f.read()
 
-    context_manager = ContextManager()
-    my_conversation = Conversation.load_from_json(conversation_json, context_manager)
-    listen = ListenManager(my_conversation)
-    talk = TalkManager(my_conversation)
-
     application = WebSocketServer()
     application.debug = True
 
     application.get_client_stream().subscribe(
-        lambda channel: channel_flow(channel, listen, talk)
+        lambda channel: channel_flow(channel, conversation_json)
     )
 
     application.run()
