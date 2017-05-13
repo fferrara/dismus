@@ -44,10 +44,16 @@ class SpotifySource(KnowledgeSource):
         pass
 
     def get_artist(self, artist_name):
+        """
+
+        :param artist_name:
+        :return: an artist object
+        :rtype: Artist
+        """
         results = self.spotify.search(q='artist:' + artist_name, type='artist')
         items = results['artists']['items']
         if len(items) > 0:
-            return items[0]
+            return self._create_artist(items[0])
         else:
             return None
 
