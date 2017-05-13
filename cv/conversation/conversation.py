@@ -34,8 +34,20 @@ class Conversation:
     def is_flag_set(self, flag):
         return self.context.is_flag(flag)
 
+    def like_artist(self, artist_id):
+        hints = self.context.like_artist(artist_id)
+        if not isinstance(hints, list):
+            hints = [hints]
+        return hints
+
     def execute_trigger(self, trigger, param):
-        return self.context.execute_trigger(trigger, param)
+        trigger_handler = getattr(self.context, trigger)
+        trigger_result = trigger_handler(param)
+
+        node = self.next_node()
+        messages = self.continue_topic(node)
+
+        return [trigger_result] + messages
 
     def next_node(self):
         try:
@@ -178,4 +190,5 @@ class Conversation:
 
         story = [create_node(record) for record in decoded]
         return Conversation(story, context)
+
 
