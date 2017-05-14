@@ -13,15 +13,15 @@ class KnowledgeSourceFactory():
 
 class ContextManager():
     def __init__(self):
-        self.artists = []
-        self.artist_likes = []
-        self.artist_dislikes = []
+        self.artists = set()
+        self.artist_likes = set()
+        self.artist_dislikes = set()
         self.source = KnowledgeSourceFactory.create()
         self.flags = {}
 
     @property
     def artist_know(self):
-        return self.artist_dislikes+self.artist_likes
+        return self.artist_dislikes | self.artist_likes
 
     def set_flag(self, setter):
         """
@@ -36,18 +36,27 @@ class ContextManager():
     def get_related_artists(self, artist_name):
         artist = self.source.get_artist(artist_name)
         related = self.source.get_related_artists(artist.id)
-        return ArtistsHint(self.__store_artists(related))
+        less_popular = sorted(related, key=lambda a: a.popularity, reverse=True)
+
+        hint = ArtistsHint()
+        return [hint] + self.__store_artists(less_popular)
 
     def like_artist(self, artist_id):
-        self.artist_likes.append(artist_id)
-        self.artists.append(artist_id)
+        self.artist_likes.add(artist_id)
+        self.artists.add(artist_id)
         related = self.source.get_related_artists(artist_id=artist_id)
+        less_popular = sorted(related, key=lambda a: a.popularity, reverse=True)
 
-        return ArtistsHint(self.__store_artists(related))
+        return self.__store_artists(less_popular)
+
+    def get_tracks_for_artist(self, artist_ids):
+        self.artists.update(artist_ids)
+
+        return self.source.get_playlist_by_artists(artist_ids)
 
     def __store_artists(self, related_artists):
         uniques = [artist for artist in related_artists
-                         if artist.id not in self.artist_know + self.artists]
+                   if artist.id not in self.artist_know | self.artists]
 
-        self.artists.extend([artist.id for artist in uniques])
+        self.artists.update([artist.id for artist in uniques])
         return uniques

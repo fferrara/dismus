@@ -1,6 +1,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from entity.artist import Artist
+from entity.track import Track
 from ..knowledge.source import KnowledgeSource
 from shared.exceptions import ArtistNotFoundException
 
@@ -20,20 +21,21 @@ class SpotifySource(KnowledgeSource):
         results = self.spotify.artist_related_artists(artist_id)
         artists = results['artists']
 
-        return [self._create_artist(a) for a in artists]
+        return [Artist.build(a) for a in artists]
 
     def __init__(self):
         self.credential_manager = SpotifyClientCredentials()
         self.spotify = spotipy.Spotify(client_credentials_manager=self.credential_manager)
 
-    def getPlaylistByArtist(self, artist_names):
-        if isinstance(artist_names, str):
-            artist_names = [artist_names]
+    def get_playlist_by_artists(self, artist_ids):
+        if isinstance(artist_ids, str):
+            artist_ids = [artist_ids]
 
-        artists = [self.get_artist(name) for name in artist_names]
-        seeds = [artist['id'] for artist in artists if artist is not None]
+        if len(artist_ids) > 5:
+            artist_ids = artist_ids[0:5]
 
-        results = self.spotify.recommendations(seed_artists = seeds)
+        results = [Track.build(t) for t in self.spotify.recommendations(seed_artists = artist_ids)['tracks']]
+        print(results[0].toDTO())
         return results
 
 
@@ -53,13 +55,10 @@ class SpotifySource(KnowledgeSource):
         results = self.spotify.search(q='artist:' + artist_name, type='artist')
         items = results['artists']['items']
         if len(items) > 0:
-            return self._create_artist(items[0])
+            return Artist.build(items[0])
         else:
             return None
 
-    def _create_artist(self, artist_dict):
-        try:
-            thumb_url = next(img['url'] for img in artist_dict['images'] if img['height'] < 400)
-        except StopIteration:
-            thumb_url = artist_dict['images'][-1]['url']
-        return Artist(artist_dict['name'], thumb_url, spotify_id=artist_dict['id'])
+    def get_popular_tracks_for_artist(self, artist_id):
+        pass
+

@@ -1,11 +1,14 @@
+from entity.artist import Artist
+
 __author__ = 'Flavio Ferrara'
 
 
-class Artist():
-    def __init__(self, name, thumb_url, spotify_id):
+class Album():
+    def __init__(self, name, thumb_url, artist, spotify_id):
         self.spotify_id = spotify_id
         self.name = name
         self.thumb_url = thumb_url
+        self.artist = artist
         self.popularity = None
         self.type = 'ARTIST'
 
@@ -13,6 +16,7 @@ class Artist():
         return {
             'type': self.type,
             'name': self.name,
+            'artist': self.artist.__repr__(),
             'thumb_url': self.thumb_url or '',
             'id': self.spotify_id
         }
@@ -26,16 +30,20 @@ class Artist():
         return self.__repr__()
 
     @classmethod
-    def build(cls, artist_dict):
+    def build(cls, album_dict):
         try:
-            thumb_url = next(img['url'] for img in artist_dict['images'] if img['height'] < 400)
+            thumb_url = next(img['url'] for img in album_dict['images'] if img['height'] < 400)
         except StopIteration:
-            thumb_url = artist_dict['images'][-1]['url']
+            thumb_url = album_dict['images'][-1]['url']
         except KeyError:
             thumb_url = None
 
-        a = Artist(artist_dict['name'], thumb_url, spotify_id=artist_dict['id'])
-        a.popularity = artist_dict.get('popularity', None)
+        a = Album(
+            album_dict['name'],
+            thumb_url,
+            Artist.build(album_dict['artists'][0]),
+            spotify_id=album_dict['id'])
+        a.popularity = album_dict.get('popularity', None)
 
         return a
 

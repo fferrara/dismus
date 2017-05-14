@@ -47,7 +47,7 @@ class Conversation:
         node = self.next_node()
         messages = self.continue_topic(node)
 
-        return [trigger_result] + messages
+        return trigger_result + messages
 
     def next_node(self):
         try:

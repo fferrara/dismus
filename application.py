@@ -39,17 +39,17 @@ def main():
     with open('res/dismus.json', encoding='utf-8') as f:
         conversation_json = f.read()
 
-    application = WebSocketServer()
-    application.debug = True
+    ws = WebSocketServer()
+    ws.debug = True
 
-    application.get_client_stream().subscribe(
+    ws.get_client_stream().subscribe(
         lambda channel: channel_flow(channel, conversation_json)
     )
 
     ws_server = Thread(target=ws.run)
     ws_server.start()
 
-    api = DisMusRest(context_manager)
+    api = DisMusRest(ContextManager())
 
     api_server = Thread(target=api.run)
     api_server.start()
