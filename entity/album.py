@@ -13,13 +13,7 @@ class Album():
         self.type = 'ARTIST'
 
     def __repr__(self):
-        return {
-            'type': self.type,
-            'name': self.name,
-            'artist': self.artist.__repr__(),
-            'thumb_url': self.thumb_url or '',
-            'id': self.spotify_id
-        }
+        return str(self.toDTO())
 
     @property
     def id(self):
@@ -27,7 +21,13 @@ class Album():
             return self.spotify_id
 
     def toDTO(self):
-        return self.__repr__()
+        return {
+            'type': self.type,
+            'name': self.name,
+            'artist': self.artist.toDTO(),
+            'thumb_url': self.thumb_url or '',
+            'id': self.spotify_id
+        }
 
     @classmethod
     def build(cls, album_dict):

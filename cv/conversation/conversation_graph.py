@@ -111,6 +111,7 @@ class Question(Node):
     def toDTO(self):
         d = {
             'type': 'QUESTION',
+            'label': self.label,
             'text': self.message
         }
 

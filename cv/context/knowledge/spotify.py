@@ -42,8 +42,16 @@ class SpotifySource(KnowledgeSource):
     def getByGenre(self, genre_name):
         pass
 
-    def getByTrack(self, tracks):
-        pass
+    def get_playlist_by_tracks(self, track_ids):
+        if isinstance(track_ids, str):
+            track_ids = [track_ids]
+
+        if len(track_ids) > 5:
+            track_ids = track_ids[0:5]
+
+        results = [Track.build(t) for t in self.spotify.recommendations(seed_tracks = track_ids)['tracks']]
+        print(results[0].toDTO())
+        return results
 
     def get_artist(self, artist_name):
         """
@@ -61,4 +69,18 @@ class SpotifySource(KnowledgeSource):
 
     def get_popular_tracks_for_artist(self, artist_id):
         pass
+
+    def get_track(self, track_name):
+        """
+
+        :param track_name:
+        :return: a List of Tracks
+        :rtype: List
+        """
+        results = self.spotify.search(q=track_name, type='track')
+        items = results['tracks']['items']
+        if len(items) == 0:
+            return None
+
+        return [Track.build(item) for item in items]
 

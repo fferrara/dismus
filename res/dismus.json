@@ -10,6 +10,7 @@
     { "label": "Asd", "m": "Ok, ho trovato questi"},
   { "m": "If you like some of them, let me know by clicking <i class=\"fa fa-thumbs-up\"></i>"},
   { "m": "If you dislike some of them, well... sorry :flushed: You can let me know though."},
-  { "q": "Vuoi dirmi una traccia?", "trigger": "get_by_track"},
+  { "label": "TypeTrack", "q": "Vuoi dirmi una traccia?", "trigger": "get_by_track" },
+  { "q": "Poi?"},
    { "label": "Ops", "m": "Dio boia"}
 ]

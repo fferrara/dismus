@@ -15,14 +15,7 @@ class Track():
         self.type = 'TRACK'
 
     def __repr__(self):
-        return {
-            'type': self.type,
-            'artist': self.artist.__repr__(),
-            'album': self.album.__repr__(),
-            'name': self.name,
-            'url': self.url,
-            'id': self.spotify_id
-        }
+        return str(self.toDTO())
 
     @property
     def id(self):
@@ -34,7 +27,14 @@ class Track():
         return self.preview_url
 
     def toDTO(self):
-        return self.__repr__()
+        return {
+            'type': self.type,
+            'artist': self.artist.toDTO(),
+            'album': self.album.toDTO(),
+            'name': self.name,
+            'url': self.url,
+            'id': self.spotify_id
+        }
 
     @classmethod
     def build(cls, data_dict):
@@ -45,3 +45,15 @@ class Track():
             Album.build(data_dict['album']),
             data_dict['id']
         )
+
+
+class TracksHint():
+
+    def __repr__(self):
+        return str(self.toDTO())
+
+    def toDTO(self):
+        return {
+            'type': 'HINT',
+            'hint': 'TRACKS',
+        }
