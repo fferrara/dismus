@@ -1,7 +1,6 @@
-from abc import ABC
-from cv.context.knowledge.spotify import SpotifySource
-from entity.artist import ArtistsHint
-from entity.track import TracksHint
+from dismus.cv.context.knowledge.spotify import SpotifySource
+from dismus.entity.artist import ArtistsHint
+from dismus.entity.track import TracksHint
 
 __author__ = 'Flavio Ferrara'
 

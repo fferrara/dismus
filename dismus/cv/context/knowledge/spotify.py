@@ -1,9 +1,10 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+
 from entity.artist import Artist
 from entity.track import Track
-from ..knowledge.source import KnowledgeSource
-from shared.exceptions import ArtistNotFoundException
+from ..src.cv.context.knowledge.source import KnowledgeSource
+
 
 __author__ = 'Flavio Ferrara'
 
@@ -35,7 +36,7 @@ class SpotifySource(KnowledgeSource):
             artist_ids = artist_ids[0:5]
 
         results = [Track.build(t) for t in self.spotify.recommendations(seed_artists = artist_ids)['tracks']]
-        print(results[0].toDTO())
+        print(results[0].serialize())
         return results
 
 
@@ -50,7 +51,7 @@ class SpotifySource(KnowledgeSource):
             track_ids = track_ids[0:5]
 
         results = [Track.build(t) for t in self.spotify.recommendations(seed_tracks = track_ids)['tracks']]
-        print(results[0].toDTO())
+        print(results[0].serialize())
         return results
 
     def get_artist(self, artist_name):

@@ -1,10 +1,10 @@
 import json
 
-from cv.conversation.conversation_graph import IntentAnswer, ChoiceAnswer, Node, RandomMessageNode, Question, \
+from dismus.cv.conversation.conversation_graph import IntentAnswer, ChoiceAnswer, Node, RandomMessageNode, Question, \
     IntentQuestion
-from cv.conversation.intent import Intent, Entity
-from ..context import ContextManager
-from shared.exceptions import LabelNotFoundException
+from dismus.cv.conversation.intent import Intent
+from dismus.cv.conversation.intent import Entity
+from dismus.shared.exceptions import LabelNotFoundException
 
 
 __author__ = 'Flavio Ferrara'

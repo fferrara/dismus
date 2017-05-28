@@ -1,8 +1,9 @@
 import json
 import logging
-from cv.listen.luis import LUISHandler
-from shared.exceptions import LabelNotFoundException
-from ..conversation import Conversation
+
+from dismus.cv.listen.luis import LUISHandler
+from dismus.shared.exceptions import LabelNotFoundException
+
 
 __author__ = 'Flavio Ferrara'
 

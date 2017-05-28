@@ -1,7 +1,8 @@
 import json
+
 from flask.ext.cors import CORS
-from flask import Flask, jsonify, request
-from cv.context import ContextManager
+from flask import Flask, request
+
 
 __author__ = 'Flavio Ferrara'
 
@@ -32,6 +33,6 @@ class DisMusRest:
         print('play {}'.format(body))
         tracks = self.context.get_tracks_for_artist(body['artists'])
 
-        a = json.dumps([track.toDTO() for track in tracks])
+        a = json.dumps([track.serialize() for track in tracks])
 
         return a

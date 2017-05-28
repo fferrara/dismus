@@ -1,7 +1,9 @@
+from dismus.entity.entity import MusicEntity
+
 __author__ = 'Flavio Ferrara'
 
 
-class Artist():
+class Artist(MusicEntity):
     def __init__(self, name, thumb_url, spotify_id):
         self.spotify_id = spotify_id
         self.name = name
@@ -10,14 +12,14 @@ class Artist():
         self.type = 'ARTIST'
 
     def __repr__(self):
-        return str(self.toDTO())
+        return str(self.serialize())
 
     @property
     def id(self):
         if self.spotify_id is not None:
             return self.spotify_id
 
-    def toDTO(self):
+    def serialize(self):
         return {
             'type': self.type,
             'name': self.name,

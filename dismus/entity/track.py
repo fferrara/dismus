@@ -1,10 +1,11 @@
-from entity.album import Album
-from entity.artist import Artist
+from dismus.entity.album import Album
+from dismus.entity.artist import Artist
+from dismus.entity.entity import MusicEntity
 
 __author__ = 'Flavio Ferrara'
 
 
-class Track():
+class Track(MusicEntity):
     def __init__(self, name, preview_url, artist, album, spotify_id):
         self.artist = artist
         self.album = album
@@ -15,7 +16,7 @@ class Track():
         self.type = 'TRACK'
 
     def __repr__(self):
-        return str(self.toDTO())
+        return str(self.serialize())
 
     @property
     def id(self):
@@ -26,11 +27,11 @@ class Track():
     def url(self):
         return self.preview_url
 
-    def toDTO(self):
+    def serialize(self):
         return {
             'type': self.type,
-            'artist': self.artist.toDTO(),
-            'album': self.album.toDTO(),
+            'artist': self.artist.serialize(),
+            'album': self.album.serialize(),
             'name': self.name,
             'url': self.url,
             'id': self.spotify_id
@@ -45,15 +46,3 @@ class Track():
             Album.build(data_dict['album']),
             data_dict['id']
         )
-
-
-class TracksHint():
-
-    def __repr__(self):
-        return str(self.toDTO())
-
-    def toDTO(self):
-        return {
-            'type': 'HINT',
-            'hint': 'TRACKS',
-        }

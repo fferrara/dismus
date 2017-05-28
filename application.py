@@ -1,11 +1,11 @@
 from threading import Thread
+
 from cv.context import ContextManager
 from cv.conversation import Conversation
 from cv.listen import ListenManager, InputSentence
-from cv.talk import TalkManager
-from ws.ws import WebSocketServer
-from rest.server import DisMusRest
-import logging
+from dismus.cv.talk import TalkManager
+from dismus.ws.ws import WebSocketServer
+from dismus.rest.server import DisMusRest
 
 
 def channel_flow(channel, conversation):

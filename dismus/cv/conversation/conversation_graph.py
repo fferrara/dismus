@@ -3,7 +3,7 @@ import collections
 import random
 import string
 
-from cv.conversation.intent import Entity, IntentResponse
+from dismus.cv.conversation.intent import Entity, IntentResponse
 
 
 __author__ = 'Flavio Ferrara'

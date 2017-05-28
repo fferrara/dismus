@@ -1,5 +1,7 @@
 import os
-from ws.rx_ws import RxWebSocketProtocol, RxWebSocketServerFactory
+
+from dismus.ws.rx_ws import RxWebSocketProtocol, RxWebSocketServerFactory
+
 
 __author__ = 'Flavio Ferrara'
 

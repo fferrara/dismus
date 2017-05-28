@@ -2,7 +2,7 @@ import os
 
 import requests
 
-from cv.conversation.intent import SentenceHandler, IntentResponse, Intent, Entity
+from dismus.cv.conversation.intent import SentenceHandler, IntentResponse, Intent, Entity
 
 
 __author__ = 'Flavio Ferrara'

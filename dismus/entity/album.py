@@ -1,9 +1,11 @@
-from entity.artist import Artist
+from dismus.entity.artist import Artist
+from dismus.entity.entity import MusicEntity
+from dismus.shared.dialogue import Utterance
 
 __author__ = 'Flavio Ferrara'
 
 
-class Album():
+class Album(MusicEntity):
     def __init__(self, name, thumb_url, artist, spotify_id):
         self.spotify_id = spotify_id
         self.name = name
@@ -13,18 +15,18 @@ class Album():
         self.type = 'ARTIST'
 
     def __repr__(self):
-        return str(self.toDTO())
+        return str(self.serialize())
 
     @property
     def id(self):
         if self.spotify_id is not None:
             return self.spotify_id
 
-    def toDTO(self):
+    def serialize(self):
         return {
             'type': self.type,
             'name': self.name,
-            'artist': self.artist.toDTO(),
+            'artist': self.artist.serialize(),
             'thumb_url': self.thumb_url or '',
             'id': self.spotify_id
         }
@@ -46,14 +48,3 @@ class Album():
         a.popularity = album_dict.get('popularity', None)
 
         return a
-
-
-class ArtistsHint():
-
-    def __repr__(self):
-        return {
-            'type': 'HINT'
-        }
-
-    def toDTO(self):
-        return self.__repr__()
